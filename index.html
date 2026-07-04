@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Etsy Fee &amp; Profit Calculator — CraftLedger</title>
+<meta name="description" content="Free Etsy fee calculator: enter your price and costs, instantly see every Etsy fee and your real profit per sale. No signup, no email — just the math.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1F3864; --teal:#2BB8A3; --amber:#D9A441; --mist:#EEF2F8;
+  --slate:#6B7A99; --loss:#C0504D; --card:#FFFFFF; --line:#DDE5F0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--mist);color:var(--navy);min-height:100vh}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 64px}
+header{display:flex;align-items:center;justify-content:space-between;padding:8px 0 28px}
+.wordmark{font-family:'Fraunces',serif;font-weight:700;font-size:22px;letter-spacing:.2px}
+.wordmark span{color:var(--teal)}
+.shoplink{font-size:14px;font-weight:600;color:var(--teal);text-decoration:none}
+.shoplink:hover{text-decoration:underline}
+h1{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(30px,5.4vw,48px);line-height:1.12;max-width:640px}
+.sub{color:var(--slate);font-size:17px;margin:12px 0 34px;max-width:560px}
+.grid{display:grid;grid-template-columns:1fr 400px;gap:26px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:16px;padding:26px;box-shadow:0 10px 30px rgba(31,56,100,.08)}
+fieldset{border:none}
+legend{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:480px){.row{grid-template-columns:1fr}}
+label{display:block;font-size:13.5px;font-weight:600;margin:0 0 6px}
+.field{margin-bottom:16px}
+.money{position:relative}
+.money::before{content:"$";position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--slate);font-weight:600}
+input[type=number]{width:100%;padding:11px 12px 11px 26px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-variant-numeric:tabular-nums;color:var(--navy);background:#FBFCFE}
+input[type=number]:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+.pct input{padding-left:12px}
+.toggle{display:flex;align-items:center;gap:10px;margin:6px 0 4px;font-size:14px;font-weight:600;cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--teal);cursor:pointer}
+details{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+summary{cursor:pointer;font-size:13.5px;font-weight:700;color:var(--slate)}
+summary:hover{color:var(--navy)}
+details .row{margin-top:14px}
+.hint{font-size:12px;color:var(--slate);margin-top:4px}
+/* receipt */
+.receipt{background:var(--card);border-radius:16px 16px 4px 4px;box-shadow:0 10px 30px rgba(31,56,100,.10);position:sticky;top:20px;overflow:hidden}
+.receipt::after{content:"";display:block;height:14px;background:
+  linear-gradient(-45deg,transparent 7px,var(--card) 0) 0 0/14px 14px repeat-x,
+  linear-gradient(45deg,transparent 7px,var(--card) 0) 0 0/14px 14px repeat-x}
+.r-head{background:var(--navy);color:#fff;padding:16px 24px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.r-body{padding:20px 24px 8px;font-variant-numeric:tabular-nums}
+.line{display:flex;justify-content:space-between;font-size:14.5px;padding:6px 0;color:var(--navy)}
+.line.fee span:last-child{color:var(--amber);font-weight:600}
+.line.cost span:last-child{color:var(--slate);font-weight:600}
+.line.muted{color:var(--slate)}
+.rule{border:none;border-top:1.5px dashed var(--line);margin:10px 0}
+.net{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0 4px}
+.net .lbl{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate)}
+.net .val{font-family:'Fraunces',serif;font-weight:700;font-size:38px;color:var(--teal)}
+.net .val.neg{color:var(--loss)}
+.margin{font-size:14px;color:var(--slate);padding-bottom:8px}
+.margin b{color:var(--navy)}
+/* anatomy bar */
+.anatomy{margin:14px 0 6px}
+.bar{display:flex;height:22px;border-radius:11px;overflow:hidden;background:var(--line)}
+.bar div{transition:width .35s ease}
+.bar .b-cost{background:var(--navy)}
+.bar .b-fee{background:var(--amber)}
+.bar .b-profit{background:var(--teal)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--slate);margin-top:8px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.warn{background:#FFF6E8;border:1px solid #F0DDB4;color:#8A6A1F;border-radius:10px;padding:10px 14px;font-size:13.5px;margin:12px 24px;display:none}
+/* CTA */
+.cta{margin-top:26px;background:var(--navy);border-radius:16px;padding:26px;color:#fff;display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.cta p{font-size:15px;max-width:520px;line-height:1.5;color:#D7E0EF}
+.cta strong{color:#fff}
+.cta a{background:var(--teal);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:13px 22px;border-radius:999px;white-space:nowrap}
+.cta a:hover{filter:brightness(1.06)}
+.faq{margin-top:34px}
+.faq h2{font-family:'Fraunces',serif;font-size:22px;margin-bottom:12px}
+.faq details{border:none;border-top:1px solid var(--line);padding:12px 0}
+.faq summary{font-size:15px;color:var(--navy)}
+.faq p{font-size:14px;color:var(--slate);margin-top:8px;line-height:1.55}
+footer{margin-top:36px;font-size:12.5px;color:var(--slate);line-height:1.6}
+@media(prefers-reduced-motion:reduce){.bar div{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="wordmark">Craft<span>Ledger</span></div>
+  <a class="shoplink" href="https://craftledger.etsy.com" rel="noopener">Visit the shop →</a>
+</header>
+
+<h1>What do you actually keep per sale?</h1>
+<p class="sub">Enter your price and costs. Every Etsy fee is calculated instantly — no signup, no email, just the math.</p>
+
+<div class="grid">
+  <div class="card">
+    <fieldset>
+      <legend>Your sale</legend>
+      <div class="row">
+        <div class="field"><label for="price">Item price</label><div class="money"><input type="number" id="price" value="25.00" min="0" step="0.01" inputmode="decimal"></div></div>
+        <div class="field"><label for="ship">Shipping charged to buyer</label><div class="money"><input type="number" id="ship" value="5.00" min="0" step="0.01" inputmode="decimal"></div></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="disc">Discount / coupon</label><div class="money"><input type="number" id="disc" value="0" min="0" step="0.01" inputmode="decimal"></div></div>
+        <div class="field" style="align-self:end">
+          <label class="toggle" for="ads"><input type="checkbox" id="ads"> Sale came from Offsite Ads</label>
+        </div>
+      </div>
+    </fieldset>
+    <fieldset style="margin-top:8px">
+      <legend>Your costs (optional)</legend>
+      <div class="row">
+        <div class="field"><label for="cogs">Materials, labor &amp; packaging</label><div class="money"><input type="number" id="cogs" value="0" min="0" step="0.01" inputmode="decimal"></div></div>
+        <div class="field"><label for="shipcost">What shipping costs you</label><div class="money"><input type="number" id="shipcost" value="0" min="0" step="0.01" inputmode="decimal"></div></div>
+      </div>
+    </fieldset>
+    <details>
+      <summary>Fee settings — defaults are standard US rates</summary>
+      <div class="row pct">
+        <div class="field"><label for="ftrans">Transaction fee %</label><input type="number" id="ftrans" value="6.5" min="0" step="0.1"></div>
+        <div class="field"><label for="fproc">Payment processing %</label><input type="number" id="fproc" value="3.0" min="0" step="0.1"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="ffix">Processing fixed fee ($)</label><div class="money"><input type="number" id="ffix" value="0.25" min="0" step="0.01"></div></div>
+        <div class="field"><label for="flist">Listing fee ($)</label><div class="money"><input type="number" id="flist" value="0.20" min="0" step="0.01"></div></div>
+      </div>
+      <div class="row pct">
+        <div class="field"><label for="fads">Offsite Ads fee %</label><input type="number" id="fads" value="15" min="0" step="0.1"></div>
+      </div>
+      <p class="hint">Rates vary by country and change over time — verify at etsy.com/legal/fees.</p>
+    </details>
+  </div>
+
+  <div>
+    <div class="receipt">
+      <div class="r-head">Your sale receipt</div>
+      <div class="warn" id="warn">Order total is below the fees — this sale loses money before costs.</div>
+      <div class="r-body">
+        <div class="line"><span>Order total</span><span id="gross">$0.00</span></div>
+        <hr class="rule">
+        <div class="line fee"><span>Transaction fee</span><span id="vtrans">−$0.00</span></div>
+        <div class="line fee"><span>Payment processing</span><span id="vproc">−$0.00</span></div>
+        <div class="line fee"><span>Listing fee</span><span id="vlist">−$0.00</span></div>
+        <div class="line fee" id="rowads" style="display:none"><span>Offsite Ads</span><span id="vads">−$0.00</span></div>
+        <div class="line muted"><span>Total Etsy fees</span><span id="vfees">−$0.00</span></div>
+        <hr class="rule">
+        <div class="line cost" id="rowcogs" style="display:none"><span>Materials, labor &amp; packaging</span><span id="vcogs">−$0.00</span></div>
+        <div class="line cost" id="rowshipc" style="display:none"><span>Shipping cost</span><span id="vshipc">−$0.00</span></div>
+        <div class="net"><span class="lbl">You keep</span><span class="val" id="net">$0.00</span></div>
+        <div class="margin">Margin: <b id="mrg">0%</b> of order total</div>
+        <div class="anatomy">
+          <div class="bar"><div class="b-cost" id="bcost"></div><div class="b-fee" id="bfee"></div><div class="b-profit" id="bprofit"></div></div>
+          <div class="legend">
+            <span><i style="background:var(--navy)"></i>Your costs</span>
+            <span><i style="background:var(--amber)"></i>Etsy fees</span>
+            <span><i style="background:var(--teal)"></i>You keep</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cta">
+  <p><strong>Pricing one item is step one.</strong> Running a whole shop takes more: the exact price for every product, real monthly profit, and cash flow you can see. That's what the CraftLedger spreadsheets do.</p>
+  <a href="https://craftledger.etsy.com" rel="noopener">Get the full toolkit →</a>
+</div>
+
+<div class="faq">
+  <h2>Quick answers</h2>
+  <details><summary>Which fees does this include?</summary><p>Etsy's transaction fee on item + shipping, payment processing (percentage + fixed), the listing fee that renews on each sale, and — when toggled — the Offsite Ads fee. All rates are editable above.</p></details>
+  <details><summary>Are the default rates right for my country?</summary><p>Defaults reflect standard US rates. Payment processing varies by country, so open "Fee settings" and adjust to match your Etsy account, then bookmark the page.</p></details>
+  <details><summary>Does this store or send my numbers anywhere?</summary><p>No. Everything is calculated in your browser. Nothing is saved, sent, or tracked by this tool.</p></details>
+</div>
+
+<footer>
+  Made by CraftLedger — spreadsheets for handmade sellers. This is an independent tool and is not affiliated with or endorsed by Etsy, Inc. Fee rates change; always verify current rates at etsy.com/legal/fees.
+</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const ids=['price','ship','disc','ads','cogs','shipcost','ftrans','fproc','ffix','flist','fads'];
+function num(id){const v=parseFloat($(id).value);return isFinite(v)&&v>=0?v:0}
+function calc(){
+  const gross=Math.max(0,num('price')+num('ship')-num('disc'));
+  const trans=gross*num('ftrans')/100;
+  const proc=gross>0?gross*num('fproc')/100+num('ffix'):0;
+  const list=gross>0?num('flist'):0;
+  const useAds=$('ads').checked;
+  const ads=useAds?gross*num('fads')/100:0;
+  const fees=trans+proc+list+ads;
+  const cogs=num('cogs'), shipc=num('shipcost');
+  const net=gross-fees-cogs-shipc;
+  $('gross').textContent=fmt(gross);
+  $('vtrans').textContent='−'+fmt(trans);
+  $('vproc').textContent='−'+fmt(proc);
+  $('vlist').textContent='−'+fmt(list);
+  $('rowads').style.display=useAds?'flex':'none';
+  $('vads').textContent='−'+fmt(ads);
+  $('vfees').textContent='−'+fmt(fees);
+  $('rowcogs').style.display=cogs>0?'flex':'none';
+  $('vcogs').textContent='−'+fmt(cogs);
+  $('rowshipc').style.display=shipc>0?'flex':'none';
+  $('vshipc').textContent='−'+fmt(shipc);
+  const netEl=$('net');
+  netEl.textContent=(net<0?'−':'')+fmt(Math.abs(net));
+  netEl.classList.toggle('neg',net<0);
+  $('mrg').textContent=gross>0?Math.round(net/gross*100)+'%':'0%';
+  $('warn').style.display=(gross>0&&gross<fees)?'block':'none';
+  const pos=Math.max(net,0), total=cogs+shipc+fees+pos;
+  const w=x=>total>0?(x/total*100)+'%':'0%';
+  $('bcost').style.width=w(cogs+shipc);
+  $('bfee').style.width=w(fees);
+  $('bprofit').style.width=w(pos);
+}
+ids.forEach(id=>$(id).addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>
