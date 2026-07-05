@@ -32,8 +32,11 @@ legend{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:upperc
 label{display:block;font-size:13.5px;font-weight:600;margin:0 0 6px}
 .field{margin-bottom:16px}
 .money{position:relative}
-.money::before{content:"$";position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--slate);font-weight:600}
-input[type=number]{width:100%;padding:11px 12px 11px 26px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-variant-numeric:tabular-nums;color:var(--navy);background:#FBFCFE}
+.money::before{content:attr(data-cur);position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--slate);font-weight:600}
+input[type=number]{width:100%;padding:11px 12px 11px 30px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-variant-numeric:tabular-nums;color:var(--navy);background:#FBFCFE}
+.curpick{display:flex;align-items:center;gap:8px}
+.curpick select{font:inherit;font-weight:600;color:var(--navy);border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;background:#fff;cursor:pointer}
+.curpick select:focus{outline:2px solid var(--teal);border-color:var(--teal)}
 input[type=number]:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
 .pct input{padding-left:12px}
 .toggle{display:flex;align-items:center;gap:10px;margin:6px 0 4px;font-size:14px;font-weight:600;cursor:pointer}
@@ -95,6 +98,18 @@ footer{margin-top:36px;font-size:12.5px;color:var(--slate);line-height:1.6}
 
 <h1>What do you actually keep per sale?</h1>
 <p class="sub">Enter your price and costs. Every Etsy fee is calculated instantly — no signup, no email, just the math.</p>
+<div class="curpick" style="margin:-16px 0 30px">
+  <label for="cur" style="margin:0;color:var(--slate)">Currency:</label>
+  <select id="cur">
+    <option value="$" data-loc="en-US">$ USD</option>
+    <option value="£" data-loc="en-GB">£ GBP</option>
+    <option value="€" data-loc="de-DE">€ EUR</option>
+    <option value="C$" data-loc="en-CA">C$ CAD</option>
+    <option value="A$" data-loc="en-AU">A$ AUD</option>
+    <option value="₺" data-loc="tr-TR">₺ TRY</option>
+    <option value="₹" data-loc="en-IN">₹ INR</option>
+  </select>
+</div>
 
 <div class="grid">
   <div class="card">
@@ -184,7 +199,13 @@ footer{margin-top:36px;font-size:12.5px;color:var(--slate);line-height:1.6}
 
 <script>
 const $=id=>document.getElementById(id);
-const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+let CUR='$';
+const fmt=n=>CUR+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+function applyCur(){
+  const sel=$('cur'); CUR=sel.value;
+  document.querySelectorAll('.money').forEach(m=>m.setAttribute('data-cur',CUR));
+}
+$('cur').addEventListener('change',()=>{applyCur();calc();});
 const ids=['price','ship','disc','ads','cogs','shipcost','ftrans','fproc','ffix','flist','fads'];
 function num(id){const v=parseFloat($(id).value);return isFinite(v)&&v>=0?v:0}
 function calc(){
@@ -220,6 +241,7 @@ function calc(){
   $('bprofit').style.width=w(pos);
 }
 ids.forEach(id=>$(id).addEventListener('input',calc));
+applyCur();
 calc();
 </script>
 </body>
